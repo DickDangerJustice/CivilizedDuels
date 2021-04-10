@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31019.35
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CivilizedDuels", "CivilizedDuels\CivilizedDuels.csproj", "{DAC1281A-C479-4CF6-8341-3796ABAA09CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DAC1281A-C479-4CF6-8341-3796ABAA09CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DAC1281A-C479-4CF6-8341-3796ABAA09CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DAC1281A-C479-4CF6-8341-3796ABAA09CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DAC1281A-C479-4CF6-8341-3796ABAA09CD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {74006634-A272-4541-8331-8212D4EE57C4}
+	EndGlobalSection
+EndGlobal
