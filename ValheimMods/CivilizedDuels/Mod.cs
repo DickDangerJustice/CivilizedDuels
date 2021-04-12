@@ -5,17 +5,20 @@ using JotunnLib.Managers;
 using Shared;
 using System;
 using UnityEngine;
+using CivilizedDuels.Services;
 
 namespace CivilizedDuels
 {
-    [BepInPlugin("dickdangerjustice.CivilizedDuels", "Example Jotunn", "1.0.0")]
+    [BepInPlugin("dickdangerjustice.CivilizedDuels", "Civilized Duels", "1.0.0")]
     [BepInDependency(JotunnLib.JotunnLib.ModGuid)]
     public class Mod : BaseUnityPlugin
     {
         private void Awake()
         {
-            PrefabManager.Instance.PrefabRegister += RegisterPrefabs;
-            ObjectManager.Instance.ObjectRegister += InitObjects;
+            WebSocketClient.Test();
+
+            //PrefabManager.Instance.PrefabRegister += RegisterPrefabs;
+            //ObjectManager.Instance.ObjectRegister += InitObjects;
         }
 
         private void RegisterPrefabs(object sender, EventArgs e)
@@ -32,7 +35,7 @@ namespace CivilizedDuels
             // PrefabManager.Instance.RegisterPrefab(swordBlock, "SwordBlock");
             AccessTools.Method(typeof(PrefabManager), "RegisterPrefab", new Type[] { typeof(GameObject), typeof(string) }).Invoke(PrefabManager.Instance, new object[] { swordBlock, "SwordBlock" });
 
-            PrefabManager.Instance.RegisterPrefab(new MagicArmor());
+            //PrefabManager.Instance.RegisterPrefab(new MagicArmor());
         }
 
         private void InitObjects(object sender, EventArgs e)
