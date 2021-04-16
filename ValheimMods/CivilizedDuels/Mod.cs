@@ -13,12 +13,28 @@ namespace CivilizedDuels
     [BepInDependency(JotunnLib.JotunnLib.ModGuid)]
     public class Mod : BaseUnityPlugin
     {
-        private void Awake()
-        {
-            WebSocketClient.Test();
+        private readonly Harmony harmony = new Harmony("dickdangerjustice.CivilizedDuels");
 
+        void Awake()
+        {
             //PrefabManager.Instance.PrefabRegister += RegisterPrefabs;
             //ObjectManager.Instance.ObjectRegister += InitObjects;
+            harmony.PatchAll();
+        }
+
+        //void OnDestroy()
+        //{
+        //    harmony.UnpatchSelf();
+        //}
+
+        [HarmonyPatch(typeof(Game), "Start")]
+        static class Player_Update_Patch
+        {
+            static void Postfix()
+            {
+                var webSocketClient = new GameObject();
+                webSocketClient.AddComponent<WebSocketClient>();
+            }
         }
 
         private void RegisterPrefabs(object sender, EventArgs e)
