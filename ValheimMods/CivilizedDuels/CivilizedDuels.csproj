@@ -34,6 +34,9 @@
     <Reference Include="0Harmony">
       <HintPath>..\..\..\Libs\New\0Harmony.dll</HintPath>
     </Reference>
+    <Reference Include="assembly_utils">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Valheim\valheim_Data\Managed\publicized_assemblies\assembly_utils.dll</HintPath>
+    </Reference>
     <Reference Include="assembly_valheim">
       <HintPath>..\..\..\Libs\New\assembly_valheim.dll</HintPath>
     </Reference>
@@ -75,10 +78,14 @@
     <Compile Include="Prefabs\CivilizedDagger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\WebSocketClient.cs" />
+    <Compile Include="StatusEffects\SE_Challenged.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="..\Shared\Shared.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(TargetDir)$(TargetName).dll" "C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins\$(TargetName).dll"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
