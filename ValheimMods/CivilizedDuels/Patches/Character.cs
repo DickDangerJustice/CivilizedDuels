@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace CivilizedDuels.Patches
 {
@@ -38,6 +39,12 @@ namespace CivilizedDuels.Patches
                         {
                             // start game in here
                             statusEffect.SetAttacker(attacker);
+                        }
+
+                        Debug.Log("Challenge open for user id: " + hit.m_attacker.userID);
+                        if (hit.m_attacker.userID != ZDOMan.instance.GetMyID())
+                        {
+                            attacker.Damage(hit);
                         }
                     }
                     return false;
