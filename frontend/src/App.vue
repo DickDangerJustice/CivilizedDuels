@@ -13,7 +13,7 @@ export default {
   },
   created: function() {
     console.log("Starting connection to WebSocket Server")
-    this.connection = new WebSocket("ws://localhost:3000")
+    this.connection = new WebSocket("ws://civilized-duels.herokuapp.com/")
 
     this.connection.onmessage = function(event) {
       console.log(event);
