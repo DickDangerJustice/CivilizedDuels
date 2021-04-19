@@ -18,6 +18,7 @@ namespace CivilizedDuels
     {
         private readonly Harmony harmony = new Harmony("dickdangerjustice.CivilizedDuels");
         public static Dictionary<string, StatusEffect> StatusEffects = new Dictionary<string, StatusEffect>();
+        public static GameObject WebSocketObject;
 
         void Awake()
         {
@@ -36,16 +37,6 @@ namespace CivilizedDuels
         //{
         //    harmony.UnpatchSelf();
         //}
-
-        [HarmonyPatch(typeof(Game), "Start")]
-        static class Player_Update_Patch
-        {
-            static void Postfix()
-            {
-                var webSocketClient = new GameObject();
-                webSocketClient.AddComponent<WebSocketClient>();
-            }
-        }
 
         private void RegisterPrefabs(object sender, EventArgs e)
         {

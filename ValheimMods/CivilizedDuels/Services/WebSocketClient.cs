@@ -27,6 +27,10 @@ namespace CivilizedDuels.Services {
             ws.Connect();
         }
 
+        void OnDestroy()
+        {
+            ws.Close();
+        }
         private void Update()
         {
             if (ws == null)
