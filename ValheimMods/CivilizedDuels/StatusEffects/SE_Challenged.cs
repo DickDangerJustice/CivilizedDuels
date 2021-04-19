@@ -41,7 +41,7 @@ namespace CivilizedDuels.StatusEffects
 		public override void UpdateStatusEffect(float dt)
         {
             base.UpdateStatusEffect(dt);
-			Debug.Log("Test");
+			//Debug.Log("Test");
         }
 
 		public override bool IsDone()

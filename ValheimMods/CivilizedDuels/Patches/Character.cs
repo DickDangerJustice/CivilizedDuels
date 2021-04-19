@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using CivilizedDuels.Services;
+using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,6 +43,8 @@ namespace CivilizedDuels.Patches
                         }
 
                         Debug.Log("Challenge open for user id: " + hit.m_attacker.userID);
+                        var webSocketClient = Mod.WebSocketObject.GetComponent<WebSocketClient>();
+                        webSocketClient.Send("Open challenge for user id: " + hit.m_attacker.userID);
                         if (hit.m_attacker.userID != ZDOMan.instance.GetMyID())
                         {
                             attacker.Damage(hit);

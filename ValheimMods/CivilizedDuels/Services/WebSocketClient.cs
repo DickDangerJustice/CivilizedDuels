@@ -43,5 +43,10 @@ namespace CivilizedDuels.Services {
                 ws.Send("Hello");
             }
         }
+
+        public void Send(string message)
+        {
+            ws.Send(message);
+        }
     }
 }
