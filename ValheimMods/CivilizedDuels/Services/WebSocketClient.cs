@@ -5,6 +5,8 @@ namespace CivilizedDuels.Services {
     public class WebSocketClient : MonoBehaviour
     {
         WebSocket ws;
+        private float timer;
+        private float pingInterval = 30;
 
         public void Start()
         {
@@ -36,6 +38,14 @@ namespace CivilizedDuels.Services {
             if (ws == null)
             {
                 return;
+            }
+
+            // keep heroku websocket alive
+            timer -= Time.deltaTime;
+            if (timer <= 0)
+            {
+                Mod.WebSocketObject.GetComponent<WebSocketClient>().Send(ZDOMan.instance != null ? "Ping from " + ZDOMan.instance.GetMyID() : "Ping");
+                timer = pingInterval;
             }
 
             if (Input.GetKeyDown(KeyCode.Space))

@@ -44,10 +44,13 @@ namespace CivilizedDuels.Patches
 
                         Debug.Log("Challenge open for user id: " + hit.m_attacker.userID);
                         var webSocketClient = Mod.WebSocketObject.GetComponent<WebSocketClient>();
-                        webSocketClient.Send("Open challenge for user id: " + hit.m_attacker.userID);
                         if (hit.m_attacker.userID != ZDOMan.instance.GetMyID())
                         {
+                            webSocketClient.Send("Challenged by id: " + hit.m_attacker.userID);
                             attacker.Damage(hit);
+                        } else
+                        {
+                            webSocketClient.Send("Sent challenge as id: " + hit.m_attacker.userID);
                         }
                     }
                     return false;
