@@ -1,4 +1,4 @@
-# civilized-duels
+# frontend
 
 ## Project setup
 ```
