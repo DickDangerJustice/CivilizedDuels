@@ -1,14 +1,13 @@
 <template>
-  <chessboard></chessboard>
+  <multi-board></multi-board>
 </template>
 
 <script>
-import { chessboard } from "vue-chessboard";
-import "vue-chessboard/dist/vue-chessboard.css";
+import MultiBoard from "./MultiBoard.vue";
 
 export default {
   components: {
-    chessboard,
+    MultiBoard,
   },
 };
 </script>
