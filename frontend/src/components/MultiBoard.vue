@@ -25,6 +25,12 @@ export default {
           fen: this.game.fen(),
         });
         this.calculatePromotions();
+        if (this.game.game_over()) {
+          if (this.game.in_checkmate()) {
+            console.log("You win!");
+            this.sendGameOver(true);
+          }
+        }
         this.sendUpdate(move);
       };
     },
@@ -39,6 +45,16 @@ export default {
         })
       );
     },
+    sendGameOver(isWin) {
+      this.connection.send(
+        JSON.stringify({
+          type: "gameOver",
+          isWin: isWin,
+          gameId: this.gameId,
+          isWhite: this.isWhite,
+        })
+      );
+    },
   },
   mounted() {
     this.board.set({
@@ -47,7 +63,7 @@ export default {
   },
   created() {
     console.log("Starting connection to WebSocket Server");
-    this.connection = new WebSocket("ws://localhost:3000");
+    this.connection = new WebSocket("ws://civilized-duels.herokuapp.com");
 
     this.connection.onmessage = (event) => {
       let message = JSON.parse(event.data);
@@ -77,6 +93,13 @@ export default {
               events: { after: this.userPlay() },
             },
           });
+
+          if (this.game.game_over()) {
+            if (this.game.in_checkmate()) {
+              console.log("You lose!");
+              this.sendGameOver(false);
+            }
+          }
       }
     };
 

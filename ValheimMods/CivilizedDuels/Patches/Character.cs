@@ -1,5 +1,6 @@
 ﻿using CivilizedDuels.Services;
 using HarmonyLib;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,6 +32,8 @@ namespace CivilizedDuels.Patches
                 {
                     if (__instance.IsPlayer() && attacker != null && attacker.IsPlayer())
                     {
+                        var webSocketClient = Mod.WebSocketObject.GetComponent<WebSocketClient>();
+
                         StatusEffect statusEffect = __instance.m_seman.GetStatusEffect(hit.m_statusEffect);
                         if (statusEffect == null)
                         {
@@ -43,13 +46,25 @@ namespace CivilizedDuels.Patches
                         }
 
                         Debug.Log("Challenge open for user id: " + hit.m_attacker.userID);
-                        var webSocketClient = Mod.WebSocketObject.GetComponent<WebSocketClient>();
+                        webSocketClient.Connect();
                         if (hit.m_attacker.userID != ZDOMan.instance.GetMyID())
-                        {
+                        {                            
+                            webSocketClient.Send(JsonConvert.SerializeObject(new Dictionary<string, string>()
+                            {
+                                { "type", "connectValheim" },
+                                { "gameId", ZDOMan.instance.GetMyID().ToString() },
+                                { "isWhite", "false" }
+                            }));
                             webSocketClient.Send("Challenged by id: " + hit.m_attacker.userID);
                             attacker.Damage(hit);
                         } else
                         {
+                            webSocketClient.Send(JsonConvert.SerializeObject(new Dictionary<string, string>()
+                            {
+                                { "type", "connectValheim" },
+                                { "gameId", ZDOMan.instance.GetMyID().ToString() },
+                                { "isWhite", "true" }
+                            }));
                             webSocketClient.Send("Sent challenge as id: " + hit.m_attacker.userID);
                         }
                     }

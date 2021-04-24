@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using WebSocketSharp;
+using Newtonsoft.Json;
 
 namespace CivilizedDuels.Services {
     public class WebSocketClient : MonoBehaviour
@@ -8,34 +9,52 @@ namespace CivilizedDuels.Services {
         private float timer;
         private float pingInterval = 30;
 
-        public void Start()
+        public void Connect()
         {
-            ws = new WebSocket("ws://civilized-duels.herokuapp.com/");
+            ws = new WebSocket("ws://civilized-duels.herokuapp.com//");
 
             ws.OnOpen += (sender, e) =>
                 Debug.Log("WS connected!");
 
+            //ws.OnMessage += (sender, e) =>
+            //{
+            //    Chat.instance.SendText(Talker.Type.Shout, e.Data);
+            //};
+
             ws.OnMessage += (sender, e) =>
             {
-                Chat.instance.SendText(Talker.Type.Shout, e.Data);
+                dynamic d = JsonConvert.DeserializeObject(e.Data);
+                switch (d.type)
+                {
+                    case "gameOver":
+                        if (d.isWin)
+                        {
+                            Chat.instance.SendText(Talker.Type.Shout, "I WIN");
+                        } else
+                        {
+                            Chat.instance.SendText(Talker.Type.Shout, "I LOSE");
+                        }
+                        ws.Close();
+                        ws = null;
+                        break;
+                }
             };
-            
+
             ws.OnError += (sender, e) =>
                 Debug.Log($"Error: {e.Message}");
 
             ws.OnClose += (sender, e) =>
                 Debug.Log("WS disconnected!");
-
-            ws.Connect();
         }
 
         void OnDestroy()
         {
             ws.Close();
         }
+
         private void Update()
         {
-            if (ws == null)
+            if (ws == null || !ws.IsAlive)
             {
                 return;
             }
