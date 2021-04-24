@@ -6,7 +6,7 @@ import "vue-chessboard/dist/vue-chessboard.css";
 export default {
   name: "newboard",
   extends: chessboard,
-  props: ["gameId"],
+  props: ["gameId", "isWhite"],
   data: function () {
     return {
       isTurn: false,
@@ -19,36 +19,23 @@ export default {
         if (this.isPromotion(orig, dest)) {
           this.promoteTo = this.onPromotion();
         }
-        this.game.move({ from: orig, to: dest, promotion: this.promoteTo }); // promote to queen for simplicity
+        let move = { from: orig, to: dest, promotion: this.promoteTo };
+        this.game.move(move); // promote to queen for simplicity
         this.board.set({
           fen: this.game.fen(),
         });
         this.calculatePromotions();
-        this.sendUpdate(this.game.fen());
-        this.aiNextMove();
+        this.sendUpdate(move);
       };
     },
-    aiNextMove() {
-      let moves = this.game.moves({ verbose: true });
-      let randomMove = moves[Math.floor(Math.random() * moves.length)];
-      this.game.move(randomMove);
-
-      this.board.set({
-        fen: this.game.fen(),
-        turnColor: this.toColor(),
-        movable: {
-          color: this.toColor(),
-          dests: this.possibleMoves(),
-          events: { after: this.userPlay() },
-        },
-      });
-    },
-    sendUpdate(fen) {
+    sendUpdate(move) {
       console.log(this.connection);
       this.connection.send(
         JSON.stringify({
+          type: "move",
           gameId: this.gameId,
-          fen: fen,
+          isWhite: this.isWhite,
+          move: move,
         })
       );
     },
@@ -62,12 +49,46 @@ export default {
     console.log("Starting connection to WebSocket Server");
     this.connection = new WebSocket("ws://localhost:3000");
 
-    this.connection.onmessage = function (event) {
-      console.log(event);
+    this.connection.onmessage = (event) => {
+      let message = JSON.parse(event.data);
+      console.log(message);
+
+      switch (message.type) {
+        case "updateBoard":
+          // console.log("TEST");
+          // this.fen = message.fen;
+          // this.board.set({
+          //   fen: this.game.fen(),
+          //   turnColor: this.toColor(),
+          //   movable: {
+          //     color: this.toColor(),
+          //     dests: this.possibleMoves(),
+          //   },
+          // });
+          console.log(message.move);
+          this.game.move(message.move);
+
+          this.board.set({
+            fen: this.game.fen(),
+            turnColor: this.toColor(),
+            movable: {
+              color: this.toColor(),
+              dests: this.possibleMoves(),
+              events: { after: this.userPlay() },
+            },
+          });
+      }
     };
 
-    this.connection.onopen = function (event) {
+    this.connection.onopen = (event) => {
       console.log(event);
+      this.connection.send(
+        JSON.stringify({
+          type: "joinGame",
+          gameId: this.gameId,
+          isWhite: this.isWhite,
+        })
+      );
       console.log("Successfully connected to the echo websocket server...");
     };
   },
