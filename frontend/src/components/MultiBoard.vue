@@ -89,6 +89,11 @@ export default {
           isWhite: this.isWhite,
         })
       );
+
+      setInterval(() => {
+        this.connection.send(JSON.stringify({ type: "ping" }));
+      }, 30000);
+
       console.log("Successfully connected to the echo websocket server...");
     };
   },
