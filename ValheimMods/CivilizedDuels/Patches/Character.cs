@@ -45,23 +45,24 @@ namespace CivilizedDuels.Patches
                             // start game in here
                             statusEffect.SetAttacker(attacker);
                         }
-
                         Debug.Log("Challenge open for user id: " + hit.m_attacker.userID);
                         webSocketClient.Connect();
                         dynamic message = new JObject();
                         message.type = "connectValheim";
                         message.gameId = ZDOMan.instance.GetMyID().ToString();
-                        if (hit.m_attacker.userID != ZDOMan.instance.GetMyID())
+                        var isAttacker = hit.m_attacker.userID == ZDOMan.instance.GetMyID();
+                        if (!isAttacker)
                         {
                             message.isWhite = false;
-                            webSocketClient.Send("Challenged by id: " + hit.m_attacker.userID);
+                            //webSocketClient.Send("Challenged by id: " + hit.m_attacker.userID);
                             attacker.Damage(hit);
                         } else
                         {
                             message.isWhite = true;
-                            webSocketClient.Send("Sent challenge as id: " + hit.m_attacker.userID);
+                            //webSocketClient.Send("Sent challenge as id: " + hit.m_attacker.userID);
                         }
                         webSocketClient.Send(message.ToString());
+                        Application.OpenURL($"http://localhost:8080/game/{hit.m_attacker.userID}?isWhite={isAttacker}");
                     }
                     return false;
                 }

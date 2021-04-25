@@ -30,6 +30,9 @@ wss.on('connection', (ws) => {
       case "move":
         move(message)
         break;
+      case "resign":
+        resign(message)
+        break;
       case "gameOver":
         gameOver(message)
         break;
@@ -66,17 +69,48 @@ function move(message) {
   }))
 }
 
+function resign(message) {
+  console.log("test")
+  valheimConnections[message.gameId]?.[message.isWhite]?.send(JSON.stringify({
+    type: "gameOver",
+    state: "lose"
+  }))
+  valheimConnections[message.gameId]?.[!message.isWhite]?.send(JSON.stringify({
+    type: "gameOver",
+    state: "win"
+  }))
+  webConnections[message.gameId][!message.isWhite].send(JSON.stringify({
+    type: "opponentResigned"
+  }))
+}
+
 function gameOver(message) {
   console.log(`Game over: ${message.gameId}, ${message.isWhite}`)
-  valheimConnections[message.gameId][message.isWhite].send(JSON.stringify({
-    type: "gameOver",
-    isWin: message.isWin
-  }))
+  
+  let sendState;
+  switch (message.state) {
+    case "win": 
+      sendState = "lose"
+      break;
+    case "lose":
+      sendState = "win"
+      break;
+    case "draw":
+      sendState = "draw"
+      break;
+  }
 
+  if (valheimConnections[message.gameId]?.[message.isWhite] != null) {
+    valheimConnections[message.gameId][message.isWhite].send(JSON.stringify({
+      type: "gameOver",
+      state: sendState
+    }))
+    valheimConnections[message.gameId][message.isWhite].close()
+    valheimConnections[message.gameId][message.isWhite] = null
+  }
+  
   webConnections[message.gameId][message.isWhite].close()
-  valheimConnections[message.gameId][message.isWhite].close()
   webConnections[message.gameId][message.isWhite] = null
-  valheimConnections[message.gameId][message.isWhite] = null
 }
 
 function clientDisconnect(ws) {

@@ -6,11 +6,28 @@ import "vue-chessboard/dist/vue-chessboard.css";
 export default {
   name: "newboard",
   extends: chessboard,
-  props: ["gameId", "isWhite"],
+  props: ["gameId", "isWhite", "resigned"],
+  watch: {
+    resigned: function (val) {
+      if (val) {
+        this.connection.send(
+          JSON.stringify({
+            type: "resign",
+            gameId: this.gameId,
+            isWhite: this.isWhite,
+          })
+        );
+        console.log("You lose!");
+        this.sendGameOver("lose");
+        this.$emit("gameOver");
+      }
+    },
+  },
   data: function () {
     return {
       isTurn: false,
       connection: null,
+      gameState: null,
     };
   },
   methods: {
@@ -28,7 +45,11 @@ export default {
         if (this.game.game_over()) {
           if (this.game.in_checkmate()) {
             console.log("You win!");
-            this.sendGameOver(true);
+            this.sendGameOver("win");
+            this.$emit("gameOver");
+          } else {
+            console.log("Draw!");
+            this.sendGameOver("draw");
           }
         }
         this.sendUpdate(move);
@@ -45,11 +66,11 @@ export default {
         })
       );
     },
-    sendGameOver(isWin) {
+    sendGameOver(state) {
       this.connection.send(
         JSON.stringify({
           type: "gameOver",
-          isWin: isWin,
+          state: state,
           gameId: this.gameId,
           isWhite: this.isWhite,
         })
@@ -63,7 +84,7 @@ export default {
   },
   created() {
     console.log("Starting connection to WebSocket Server");
-    this.connection = new WebSocket("ws://civilized-duels.herokuapp.com");
+    this.connection = new WebSocket("ws://localhost:3000");
 
     this.connection.onmessage = (event) => {
       let message = JSON.parse(event.data);
@@ -71,16 +92,6 @@ export default {
 
       switch (message.type) {
         case "updateBoard":
-          // console.log("TEST");
-          // this.fen = message.fen;
-          // this.board.set({
-          //   fen: this.game.fen(),
-          //   turnColor: this.toColor(),
-          //   movable: {
-          //     color: this.toColor(),
-          //     dests: this.possibleMoves(),
-          //   },
-          // });
           console.log(message.move);
           this.game.move(message.move);
 
@@ -97,9 +108,18 @@ export default {
           if (this.game.game_over()) {
             if (this.game.in_checkmate()) {
               console.log("You lose!");
-              this.sendGameOver(false);
+              this.sendGameOver("lose");
+              this.$emit("gameOver");
+            } else {
+              console.log("Draw!");
+              this.sendGameOver("draw");
+              this.$emit("gameOver");
             }
           }
+          break;
+        case "opponentResigned":
+          console.log("You win!");
+          this.$emit("gameOver");
       }
     };
 
