@@ -62,7 +62,7 @@ namespace CivilizedDuels.Patches
                             //webSocketClient.Send("Sent challenge as id: " + hit.m_attacker.userID);
                         }
                         webSocketClient.Send(message.ToString());
-                        Application.OpenURL($"http://localhost:8080/game/{hit.m_attacker.userID}?isWhite={isAttacker}");
+                        Application.OpenURL($"https://serene-johnson-5519cc.netlify.app/game/{hit.m_attacker.userID}?isWhite={isAttacker}");
                     }
                     return false;
                 }
