@@ -28,12 +28,17 @@ namespace CivilizedDuels.Services {
                 switch (d.type)
                 {
                     case "gameOver":
-                        if (d.isWin)
+                        switch (d.state)
                         {
-                            Chat.instance.SendText(Talker.Type.Shout, "I WIN");
-                        } else
-                        {
-                            Chat.instance.SendText(Talker.Type.Shout, "I LOSE");
+                            case "win":
+                                Chat.instance.SendText(Talker.Type.Shout, "I WIN");
+                                break;
+                            case "lose":
+                                Chat.instance.SendText(Talker.Type.Shout, "I LOSE");
+                                break;
+                            case "draw":
+                                Chat.instance.SendText(Talker.Type.Shout, "DRAW");
+                                break;
                         }
                         ws.Close();
                         ws = null;
