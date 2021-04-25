@@ -4,6 +4,7 @@
     <input type="checkbox" v-model="isWhite" />
     <button @click="startGame">Start Game</button> -->
     <multi-board
+      class="game"
       :gameId="gameId"
       :isWhite="isWhite"
       :orientation="isWhite ? 'white' : 'black'"
@@ -36,4 +37,11 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.game {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 5vh;
+}
+</style>
