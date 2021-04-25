@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using WebSocketSharp;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CivilizedDuels.Services {
     public class WebSocketClient : MonoBehaviour
@@ -23,7 +24,7 @@ namespace CivilizedDuels.Services {
 
             ws.OnMessage += (sender, e) =>
             {
-                dynamic d = JsonConvert.DeserializeObject(e.Data);
+                dynamic d = JObject.Parse(e.Data);
                 switch (d.type)
                 {
                     case "gameOver":

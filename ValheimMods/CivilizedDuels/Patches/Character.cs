@@ -1,6 +1,7 @@
 ﻿using CivilizedDuels.Services;
 using HarmonyLib;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,26 +48,20 @@ namespace CivilizedDuels.Patches
 
                         Debug.Log("Challenge open for user id: " + hit.m_attacker.userID);
                         webSocketClient.Connect();
+                        dynamic message = new JObject();
+                        message.type = "connectValheim";
+                        message.gameId = ZDOMan.instance.GetMyID().ToString();
                         if (hit.m_attacker.userID != ZDOMan.instance.GetMyID())
-                        {                            
-                            webSocketClient.Send(JsonConvert.SerializeObject(new Dictionary<string, string>()
-                            {
-                                { "type", "connectValheim" },
-                                { "gameId", ZDOMan.instance.GetMyID().ToString() },
-                                { "isWhite", "false" }
-                            }));
+                        {
+                            message.isWhite = false;
                             webSocketClient.Send("Challenged by id: " + hit.m_attacker.userID);
                             attacker.Damage(hit);
                         } else
                         {
-                            webSocketClient.Send(JsonConvert.SerializeObject(new Dictionary<string, string>()
-                            {
-                                { "type", "connectValheim" },
-                                { "gameId", ZDOMan.instance.GetMyID().ToString() },
-                                { "isWhite", "true" }
-                            }));
+                            message.isWhite = true;
                             webSocketClient.Send("Sent challenge as id: " + hit.m_attacker.userID);
                         }
+                        webSocketClient.Send(message.ToString());
                     }
                     return false;
                 }
