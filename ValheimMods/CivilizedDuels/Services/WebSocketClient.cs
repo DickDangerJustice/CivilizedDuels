@@ -56,6 +56,7 @@ namespace CivilizedDuels.Services {
             ws.OnError += (sender, e) =>
             {
                 Debug.Log($"Error: {e.Message}");
+                Player.m_localPlayer.m_intro = false;
                 if (!ws.IsAlive)
                 {
                     ws.Connect();

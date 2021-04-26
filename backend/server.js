@@ -94,25 +94,12 @@ function resign(message) {
 
 function gameOver(message) {
   console.log(`Game over: ${message.gameId}, ${message.isWhite}`)
-  
-  let sendState;
-  switch (message.state) {
-    case "win": 
-      sendState = "lose"
-      break;
-    case "lose":
-      sendState = "win"
-      break;
-    case "draw":
-      sendState = "draw"
-      break;
-  }
 
   if (message.gameId in valheimConnections) {
     if (valheimConnections[message.gameId][message.isWhite]) {
       valheimConnections[message.gameId][message.isWhite].send(JSON.stringify({
         type: "gameOver",
-        state: sendState
+        state: message.state
       }))
       delete valheimConnections[message.gameId][message.isWhite]
     }
