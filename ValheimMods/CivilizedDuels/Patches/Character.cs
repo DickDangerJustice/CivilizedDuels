@@ -52,7 +52,7 @@ namespace CivilizedDuels.Patches
                         {
                             type = "connectValheim",
                             isWhite = isAttacker,
-                            gameId = ZDOMan.instance.GetMyID().ToString()
+                            gameId = isAttacker ? ZDOMan.instance.GetMyID().ToString() : hit.m_attacker.userID.ToString()
                         };
 
                         //message.type = "connectValheim";

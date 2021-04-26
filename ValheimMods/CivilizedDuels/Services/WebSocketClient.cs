@@ -54,7 +54,13 @@ namespace CivilizedDuels.Services {
             };
 
             ws.OnError += (sender, e) =>
+            {
                 Debug.Log($"Error: {e.Message}");
+                if (!ws.IsAlive)
+                {
+                    ws.Connect();
+                }
+            };
 
             ws.OnClose += (sender, e) =>
                 Debug.Log("WS disconnected!");
@@ -69,6 +75,11 @@ namespace CivilizedDuels.Services {
 
         private void Update()
         {
+            //if (ws == null || !ws.IsAlive)
+            //{
+            //    return;
+            //}
+
             // keep heroku websocket alive
             timer -= Time.deltaTime;
             if (timer <= 0)
