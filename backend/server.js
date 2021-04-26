@@ -114,7 +114,6 @@ function gameOver(message) {
         type: "gameOver",
         state: sendState
       }))
-      valheimConnections[message.gameId][message.isWhite].close()
       delete valheimConnections[message.gameId][message.isWhite]
     }
   }
