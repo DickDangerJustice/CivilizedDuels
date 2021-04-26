@@ -71,14 +71,21 @@ function move(message) {
 
 function resign(message) {
   console.log("test")
-  valheimConnections[message.gameId]?.[message.isWhite]?.send(JSON.stringify({
-    type: "gameOver",
-    state: "lose"
-  }))
-  valheimConnections[message.gameId]?.[!message.isWhite]?.send(JSON.stringify({
-    type: "gameOver",
-    state: "win"
-  }))
+  if (message.gameId in valheimConnections) {
+    if (valheimConnections[message.gameId][message.isWhite] !== null) {
+      valheimConnections[message.gameId][message.isWhite].send(JSON.stringify({
+        type: "gameOver",
+        state: "lose"
+      }))
+    }
+    if (valheimConnections[message.gameId][!message.isWhite] !== null) {
+      valheimConnections[message.gameId][!message.isWhite].send(JSON.stringify({
+        type: "gameOver",
+        state: "win"
+      }))
+    }
+  }
+  
   webConnections[message.gameId][!message.isWhite].send(JSON.stringify({
     type: "opponentResigned"
   }))
@@ -100,13 +107,15 @@ function gameOver(message) {
       break;
   }
 
-  if (valheimConnections[message.gameId]?.[message.isWhite] != null) {
-    valheimConnections[message.gameId][message.isWhite].send(JSON.stringify({
-      type: "gameOver",
-      state: sendState
-    }))
-    valheimConnections[message.gameId][message.isWhite].close()
-    valheimConnections[message.gameId][message.isWhite] = null
+  if (message.gameId in valheimConnections) {
+    if (valheimConnections[message.gameId][message.isWhite] !== null) {
+      valheimConnections[message.gameId][message.isWhite].send(JSON.stringify({
+        type: "gameOver",
+        state: sendState
+      }))
+      valheimConnections[message.gameId][message.isWhite].close()
+      valheimConnections[message.gameId][message.isWhite] = null
+    }
   }
   
   webConnections[message.gameId][message.isWhite].close()

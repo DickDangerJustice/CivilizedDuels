@@ -25,7 +25,6 @@ export default {
   },
   data: function () {
     return {
-      isTurn: false,
       connection: null,
       gameState: null,
     };
@@ -80,6 +79,7 @@ export default {
   mounted() {
     this.board.set({
       movable: { events: { after: this.userPlay() } },
+      viewOnly: true,
     });
   },
   created() {
@@ -91,6 +91,11 @@ export default {
       console.log(message);
 
       switch (message.type) {
+        case "startGame":
+          this.board.set({
+            viewOnly: false,
+          });
+          break;
         case "updateBoard":
           console.log(message.move);
           this.game.move(message.move);

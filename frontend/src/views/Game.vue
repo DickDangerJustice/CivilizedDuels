@@ -27,7 +27,6 @@ export default {
   },
   data() {
     return {
-      gameStarted: false,
       resigned: false,
       isGameOver: false,
     };
