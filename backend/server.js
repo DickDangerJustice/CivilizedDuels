@@ -114,9 +114,17 @@ function clientDisconnect(ws) {
   if (websocketGameMap.has(ws)) {
     const connection = websocketGameMap.get(ws)
     if (connection.gameId in webConnections) {
-      if (webConnections[connection.gameId][connection.isWhite]) {
-        webConnections[connection.gameId][connection.isWhite].close()
-        webConnections[connection.gameId][connection.isWhite] = null
+      for (const webConnection in webConnections) {
+        webConnections[connection.gameId][webConnection].close()
+        delete webConnections[connection.gameId][webConnection]
+      }
+    }
+    if (connection.gameId in valheimConnections) {
+      for (const valheimConnection in valheimConnections[connection.gameId]) {
+        valheimConnections[connection.gameId][valheimConnection].send(JSON.stringify({
+          type: "gameOver",
+          state: "draw"
+        }))
       }
     }
   }
