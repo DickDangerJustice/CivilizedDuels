@@ -32,6 +32,7 @@ namespace CivilizedDuels.Patches
                 {
                     if (__instance.IsPlayer() && attacker != null && attacker.IsPlayer())
                     {
+                        //((Player)__instance).m_teleporting = true;
                         var webSocketClient = Mod.WebSocketObject.GetComponent<WebSocketClient>();
 
                         StatusEffect statusEffect = __instance.m_seman.GetStatusEffect(hit.m_statusEffect);

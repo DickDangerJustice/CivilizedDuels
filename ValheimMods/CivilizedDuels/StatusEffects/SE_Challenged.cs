@@ -24,19 +24,20 @@ namespace CivilizedDuels.StatusEffects
 			m_attacker = attacker;
 			//m_time = 0f;
 			m_attacker.Message(MessageHud.MessageType.Center, m_character.m_name + " challenged");
-			//GameObject[] startEffectInstances = m_startEffectInstances;
-			//foreach (GameObject gameObject in startEffectInstances)
-			//{
-			//	if ((bool)gameObject)
-			//	{
-			//		LineConnect component = gameObject.GetComponent<LineConnect>();
-			//		if ((bool)component)
-			//		{
-			//			component.SetPeer(m_attacker.GetComponent<ZNetView>());
-			//		}
-			//	}
-			//}
-		}
+            //Player.m_localPlayer.m_teleporting = true;
+            //GameObject[] startEffectInstances = m_startEffectInstances;
+            //foreach (GameObject gameObject in startEffectInstances)
+            //{
+            //	if ((bool)gameObject)
+            //	{
+            //		LineConnect component = gameObject.GetComponent<LineConnect>();
+            //		if ((bool)component)
+            //		{
+            //			component.SetPeer(m_attacker.GetComponent<ZNetView>());
+            //		}
+            //	}
+            //}
+        }
 
 		public override void UpdateStatusEffect(float dt)
         {
@@ -44,7 +45,13 @@ namespace CivilizedDuels.StatusEffects
 			//Debug.Log("Test");
         }
 
-		public override bool IsDone()
+        public override void Stop()
+        {
+            base.Stop();
+            //Player.m_localPlayer.m_teleporting = false;
+        }
+
+        public override bool IsDone()
 		{
 			if (base.IsDone())
 			{

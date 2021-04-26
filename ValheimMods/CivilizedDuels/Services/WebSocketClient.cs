@@ -35,16 +35,18 @@ namespace CivilizedDuels.Services {
                 switch (message.type)
                 {
                     case "gameOver":
+                        //Player.m_localPlayer.m_seman.RemoveStatusEffect(Mod.StatusEffects["Challenged"]);
+                        //Player.m_localPlayer.m_teleporting = false;
                         switch (message.state)
                         {
                             case "win":
-                                Chat.instance.SendText(Talker.Type.Shout, "I WIN");
                                 break;
                             case "lose":
-                                Chat.instance.SendText(Talker.Type.Shout, "I LOSE");
+                                var hitData = new HitData();
+                                hitData.m_damage.m_damage = 99999f;
+                                Player.m_localPlayer.Damage(hitData);
                                 break;
                             case "draw":
-                                Chat.instance.SendText(Talker.Type.Shout, "DRAW");
                                 break;
                         }
                         break;
