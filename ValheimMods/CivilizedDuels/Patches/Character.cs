@@ -1,7 +1,6 @@
 ﻿using CivilizedDuels.Services;
 using HarmonyLib;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using LitJson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,21 +45,27 @@ namespace CivilizedDuels.Patches
                             statusEffect.SetAttacker(attacker);
                         }
                         Debug.Log("Challenge open for user id: " + hit.m_attacker.userID);
-                        dynamic message = new JObject();
-                        message.type = "connectValheim";
-                        message.gameId = ZDOMan.instance.GetMyID().ToString();
+                        //dynamic message = new JObject();
                         var isAttacker = hit.m_attacker.userID == ZDOMan.instance.GetMyID();
+
+                        var message = new Message
+                        {
+                            type = "connectValheim",
+                            isWhite = isAttacker,
+                            gameId = ZDOMan.instance.GetMyID().ToString()
+                        };
+
+                        //message.type = "connectValheim";
+                        //message.gameId = ZDOMan.instance.GetMyID().ToString();
+                        webSocketClient.Send(JsonMapper.ToJson(message));
+
                         if (!isAttacker)
                         {
-                            message.isWhite = false;
                             //webSocketClient.Send("Challenged by id: " + hit.m_attacker.userID);
                             attacker.Damage(hit);
-                        } else
-                        {
-                            message.isWhite = true;
-                            //webSocketClient.Send("Sent challenge as id: " + hit.m_attacker.userID);
                         }
-                        webSocketClient.Send(message.ToString());
+
+                        
                         Application.OpenURL($"https://serene-johnson-5519cc.netlify.app/game/{hit.m_attacker.userID}?isWhite={isAttacker}");
                     }
                     return false;

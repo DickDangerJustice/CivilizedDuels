@@ -1,15 +1,21 @@
-﻿using UnityEngine;
+﻿using LitJson;
+using UnityEngine;
 using WebSocketSharp;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace CivilizedDuels.Services {
+    public class Message
+    {
+        public string type { get; set; }
+        public bool isWhite { get; set; }
+        public string gameId { get; set; }
+        public string state { get; set; }
+    }
+
     public class WebSocketClient : MonoBehaviour
     {
         WebSocket ws;
         private float timer;
         private float pingInterval = 30;
-
 
         public void Start()
         {
@@ -25,11 +31,11 @@ namespace CivilizedDuels.Services {
 
             ws.OnMessage += (sender, e) =>
             {
-                dynamic d = JObject.Parse(e.Data);
-                switch (d.type)
+                var message = JsonMapper.ToObject<Message>(e.Data);
+                switch (message.type)
                 {
                     case "gameOver":
-                        switch (d.state)
+                        switch (message.state)
                         {
                             case "win":
                                 Chat.instance.SendText(Talker.Type.Shout, "I WIN");
@@ -52,6 +58,8 @@ namespace CivilizedDuels.Services {
 
             ws.OnClose += (sender, e) =>
                 Debug.Log("WS disconnected!");
+
+            ws.Connect();
         }
 
         void OnDestroy()
@@ -61,22 +69,16 @@ namespace CivilizedDuels.Services {
 
         private void Update()
         {
-            if (ws == null || !ws.IsAlive)
-            {
-                return;
-            }
-
             // keep heroku websocket alive
             timer -= Time.deltaTime;
             if (timer <= 0)
             {
-                Mod.WebSocketObject.GetComponent<WebSocketClient>().Send(ZDOMan.instance != null ? "Ping from " + ZDOMan.instance.GetMyID() : "Ping");
+                var message = new Message
+                {
+                    type = "ping"
+                };
+                ws.Send(JsonMapper.ToJson(message));
                 timer = pingInterval;
-            }
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                ws.Send("Hello");
             }
         }
 
