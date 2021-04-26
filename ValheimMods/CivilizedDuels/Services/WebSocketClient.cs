@@ -47,8 +47,6 @@ namespace CivilizedDuels.Services {
                                 Chat.instance.SendText(Talker.Type.Shout, "DRAW");
                                 break;
                         }
-                        ws.Close();
-                        ws = null;
                         break;
                 }
             };
