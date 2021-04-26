@@ -43,7 +43,7 @@ wss.on('connection', (ws) => {
 });
 
 function connectValheim(message, ws) {
-  if (!valheimConnections[message.gameId]) valheimConnections[message.gameId] = {}
+  if (!(message.gameId in valheimConnections)) valheimConnections[message.gameId] = {}
   valheimConnections[message.gameId][message.isWhite] = ws
   console.log(valheimConnections[message.gameId])
   websocketGameMap.set(ws, [message.gameId, message.isWhite])
@@ -51,7 +51,7 @@ function connectValheim(message, ws) {
 
 function joinGame(message, ws) {
   // create entry for game if it doesn't exist
-  if (!webConnections[message.gameId]) webConnections[message.gameId] = {}
+  if (!(message.gameId in webConnections)) webConnections[message.gameId] = {}
 
   // log connection for player
   webConnections[message.gameId][message.isWhite] = ws
@@ -115,12 +115,12 @@ function gameOver(message) {
         state: sendState
       }))
       valheimConnections[message.gameId][message.isWhite].close()
-      valheimConnections[message.gameId][message.isWhite] = null
+      delete valheimConnections[message.gameId][message.isWhite]
     }
   }
   
   webConnections[message.gameId][message.isWhite].close()
-  webConnections[message.gameId][message.isWhite] = null
+  delete webConnections[message.gameId][message.isWhite]
 }
 
 function clientDisconnect(ws) {
