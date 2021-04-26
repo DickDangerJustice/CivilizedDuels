@@ -23,7 +23,7 @@ namespace CivilizedDuels.StatusEffects
 			ZLog.Log("Setting attacker " + attacker.m_name);
 			m_attacker = attacker;
 			//m_time = 0f;
-			m_attacker.Message(MessageHud.MessageType.Center, m_character.m_name + " challenged");
+			m_attacker.Message(MessageHud.MessageType.Center, "Player challenged!");
             //Player.m_localPlayer.m_teleporting = true;
             //GameObject[] startEffectInstances = m_startEffectInstances;
             //foreach (GameObject gameObject in startEffectInstances)

@@ -36,7 +36,7 @@ namespace CivilizedDuels.Services {
                 {
                     case "gameOver":
                         //Player.m_localPlayer.m_seman.RemoveStatusEffect(Mod.StatusEffects["Challenged"]);
-                        //Player.m_localPlayer.m_teleporting = false;
+                        Player.m_localPlayer.m_intro = false;
                         switch (message.state)
                         {
                             case "win":
