@@ -23,7 +23,7 @@ const routes = [
     path: '/game/:gameId',
     name: 'Game',
     component: Game,
-    props: route => ({ gameId: route.params.gameId, isWhite: route.query.isWhite === "true" })
+    props: route => ({ gameId: route.params.gameId, isWhite: route.query.isWhite.toLowerCase() === "true" })
   }
 ]
 
