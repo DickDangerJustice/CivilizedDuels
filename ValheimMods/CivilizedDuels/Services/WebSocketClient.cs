@@ -10,7 +10,8 @@ namespace CivilizedDuels.Services {
         private float timer;
         private float pingInterval = 30;
 
-        public void Connect()
+
+        public void Start()
         {
             ws = new WebSocket("wss://civilized-duels.herokuapp.com//");
 

@@ -46,7 +46,6 @@ namespace CivilizedDuels.Patches
                             statusEffect.SetAttacker(attacker);
                         }
                         Debug.Log("Challenge open for user id: " + hit.m_attacker.userID);
-                        webSocketClient.Connect();
                         dynamic message = new JObject();
                         message.type = "connectValheim";
                         message.gameId = ZDOMan.instance.GetMyID().ToString();
