@@ -55,6 +55,7 @@ function joinGame(message, ws) {
 
   // log connection for player
   webConnections[message.gameId][message.isWhite] = ws
+  websocketGameMap.set(ws, [message.gameId, message.isWhite])
 
   // if both players have joined, start the game for each
   if (webConnections[message.gameId][!message.isWhite]) {
