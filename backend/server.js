@@ -45,6 +45,7 @@ wss.on('connection', (ws) => {
 function connectValheim(message, ws) {
   if (!valheimConnections[message.gameId]) valheimConnections[message.gameId] = {}
   valheimConnections[message.gameId][message.isWhite] = ws
+  console.log(valheimConnections[message.gameId])
   websocketGameMap.set(ws, [message.gameId, message.isWhite])
 }
 
@@ -72,13 +73,13 @@ function move(message) {
 function resign(message) {
   console.log("test")
   if (message.gameId in valheimConnections) {
-    if (valheimConnections[message.gameId][message.isWhite] !== null) {
+    if (valheimConnections[message.gameId][message.isWhite]) {
       valheimConnections[message.gameId][message.isWhite].send(JSON.stringify({
         type: "gameOver",
         state: "lose"
       }))
     }
-    if (valheimConnections[message.gameId][!message.isWhite] !== null) {
+    if (valheimConnections[message.gameId][!message.isWhite]) {
       valheimConnections[message.gameId][!message.isWhite].send(JSON.stringify({
         type: "gameOver",
         state: "win"
@@ -108,7 +109,7 @@ function gameOver(message) {
   }
 
   if (message.gameId in valheimConnections) {
-    if (valheimConnections[message.gameId][message.isWhite] !== null) {
+    if (valheimConnections[message.gameId][message.isWhite]) {
       valheimConnections[message.gameId][message.isWhite].send(JSON.stringify({
         type: "gameOver",
         state: sendState
