@@ -68,8 +68,15 @@ namespace CivilizedDuels
 
         private void RegisterPrefabs(object sender, EventArgs e)
         {
+            var slappingFishBundle = AssetBundleHelper.GetAssetBundleFromResources("slappingfish");
+            var slappingFish = slappingFishBundle.LoadAsset<GameObject>("Assets/CustomItems/SlappingFish/SlappingFish.prefab");
+            var slappingFishItemDrop = slappingFish.GetComponent<ItemDrop>();
+            slappingFishItemDrop.m_itemData.m_shared.m_damages.m_slash = 0;
+            slappingFishItemDrop.m_itemData.m_shared.m_damages.m_pierce = 0;
 
-            PrefabManager.Instance.RegisterPrefab(new CivilizedDagger());
+            // set status effect
+            slappingFishItemDrop.m_itemData.m_shared.m_attackStatusEffect = StatusEffects["Challenged"];
+            PrefabManager.Instance.RegisterPrefab(slappingFish, "SlappingFish");
         }
 
         private void InitObjects(object sender, EventArgs e)
@@ -84,17 +91,17 @@ namespace CivilizedDuels
                 }
             }
 
-            // Add civilized dagger as an item
-            ObjectManager.Instance.RegisterItem("CivilizedDagger");
+            // Add slapping fish as an item
+            ObjectManager.Instance.RegisterItem("SlappingFish");
 
             // Add a sample recipe for the example sword
             ObjectManager.Instance.RegisterRecipe(new RecipeConfig()
             {
                 // Name of the recipe (defaults to "Recipe_YourItem")
-                Name = "Recipe_CivilizedDagger",
+                Name = "Recipe_SlappingFish",
 
                 // Name of the prefab for the crafted item
-                Item = "CivilizedDagger",
+                Item = "SlappingFish",
 
                 // Name of the prefab for the crafting station we wish to use
                 // Can set this to null or leave out if you want your recipe to be craftable in your inventory
