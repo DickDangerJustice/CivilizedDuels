@@ -46,7 +46,7 @@ function connectValheim(message, ws) {
   if (!(message.gameId in valheimConnections)) valheimConnections[message.gameId] = {}
   valheimConnections[message.gameId][message.isWhite] = ws
   console.log(valheimConnections[message.gameId])
-  websocketGameMap.set(ws, [message.gameId, message.isWhite])
+  websocketGameMap.set(ws, {gameId: message.gameId, isWhite: message.isWhite})
 }
 
 function joinGame(message, ws) {
@@ -55,7 +55,7 @@ function joinGame(message, ws) {
 
   // log connection for player
   webConnections[message.gameId][message.isWhite] = ws
-  websocketGameMap.set(ws, [message.gameId, message.isWhite])
+  websocketGameMap.set(ws, {gameId: message.gameId, isWhite: message.isWhite})
 
   // if both players have joined, start the game for each
   if (webConnections[message.gameId][!message.isWhite]) {
@@ -72,7 +72,6 @@ function move(message) {
 }
 
 function resign(message) {
-  console.log("test")
   if (message.gameId in valheimConnections) {
     if (valheimConnections[message.gameId][message.isWhite]) {
       valheimConnections[message.gameId][message.isWhite].send(JSON.stringify({
@@ -87,10 +86,22 @@ function resign(message) {
       }))
     }
   }
-  
+
   webConnections[message.gameId][!message.isWhite].send(JSON.stringify({
     type: "opponentResigned"
   }))
+
+  deleteWebConnections(message.gameId)
+}
+
+function deleteWebConnections(gameId) {
+  if (gameId in webConnections) {
+    for (const webConnection in webConnections[gameId]) {
+      webConnections[gameId][webConnection].close()
+      delete webConnections[gameId][webConnection]
+      websocketGameMap.delete(webConnection)
+    }
+  }
 }
 
 function gameOver(message) {
@@ -115,13 +126,17 @@ function clientDisconnect(ws) {
   if (websocketGameMap.has(ws)) {
     console.log("Handling disconnect")
     const connection = websocketGameMap.get(ws)
+
     if (connection.gameId in webConnections) {
-      for (const webConnection in webConnections[connection.gameId]) {
-        webConnections[connection.gameId][webConnection].close()
-        delete webConnections[connection.gameId][webConnection]
-        websocketGameMap.delete(webConnection)
-      }
+      if (webConnections[connection.gameId][!connection.isWhite]) {
+        console.log("test")
+        webConnections[connection.gameId][!connection.isWhite].send(JSON.stringify({
+          type: "opponentResigned"
+        }))
+      };
     }
+    deleteWebConnections(connection.gameId)
+
     if (connection.gameId in valheimConnections) {
       for (const valheimConnection in valheimConnections[connection.gameId]) {
         valheimConnections[connection.gameId][valheimConnection].send(JSON.stringify({

@@ -3,15 +3,20 @@
     <!-- <input type="text" v-model="gameId" placeholder="Game Id" />
     <input type="checkbox" v-model="isWhite" />
     <button @click="startGame">Start Game</button> -->
-    <multi-board
-      v-if="!isGameOver"
-      class="game"
-      :gameId="gameId"
-      :isWhite="isWhite"
-      :orientation="isWhite ? 'white' : 'black'"
-      :resigned="resigned"
-      @gameOver="handleGameOver"
-    ></multi-board>
+    <div v-if="!isGameOver">
+      <multi-board
+        class="game"
+        :gameId="gameId"
+        :isWhite="isWhite"
+        :orientation="isWhite ? 'white' : 'black'"
+        :resigned="resigned"
+        :startingTime="time"
+        @gameOver="handleGameOver"
+        @timeChanged="updateTimer"
+      ></multi-board>
+      <h5>Time remaining: {{ time }}</h5>
+    </div>
+
     <h1 v-else>Game over!</h1>
     <button v-if="!isGameOver" @click="resign">Resign</button>
   </div>
@@ -29,6 +34,7 @@ export default {
     return {
       resigned: false,
       isGameOver: false,
+      time: 60,
     };
   },
   methods: {
@@ -40,6 +46,9 @@ export default {
     },
     handleGameOver() {
       this.isGameOver = true;
+    },
+    updateTimer(time) {
+      this.time = time;
     },
   },
   mounted() {

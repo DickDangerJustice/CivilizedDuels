@@ -6,27 +6,24 @@ import "vue-chessboard/dist/vue-chessboard.css";
 export default {
   name: "newboard",
   extends: chessboard,
-  props: ["gameId", "isWhite", "resigned"],
+  props: ["gameId", "isWhite", "resigned", "startingTime"],
   watch: {
     resigned: function (val) {
       if (val) {
-        this.connection.send(
-          JSON.stringify({
-            type: "resign",
-            gameId: this.gameId,
-            isWhite: this.isWhite,
-          })
-        );
-        console.log("You lose!");
-        this.sendGameOver("lose");
-        this.$emit("gameOver");
+        this.resign();
       }
+    },
+    time: function (val) {
+      this.$emit("timeChanged", val);
     },
   },
   data: function () {
     return {
       connection: null,
       gameState: null,
+      timer: null,
+      ping: null,
+      time: 0,
     };
   },
   methods: {
@@ -45,17 +42,18 @@ export default {
           if (this.game.in_checkmate()) {
             console.log("You win!");
             this.sendGameOver("win");
-            this.$emit("gameOver");
           } else {
             console.log("Draw!");
             this.sendGameOver("draw");
           }
+          this.gameOver();
         }
         this.sendUpdate(move);
       };
     },
     sendUpdate(move) {
       console.log(this.connection);
+      clearInterval(this.timer);
       this.connection.send(
         JSON.stringify({
           type: "move",
@@ -75,6 +73,28 @@ export default {
         })
       );
     },
+    resign() {
+      this.connection.send(
+        JSON.stringify({
+          type: "resign",
+          gameId: this.gameId,
+          isWhite: this.isWhite,
+        })
+      );
+      console.log("You lose!");
+      this.gameOver();
+    },
+    handleTimer() {
+      this.time -= 1;
+      if (this.time <= 0) {
+        this.resign();
+        clearInterval(this.timer);
+      }
+    },
+    gameOver() {
+      clearInterval(this.ping);
+      this.$emit("gameOver");
+    },
   },
   mounted() {
     this.board.set({
@@ -83,8 +103,9 @@ export default {
     });
   },
   created() {
+    this.time = this.startingTime;
     console.log("Starting connection to WebSocket Server");
-    this.connection = new WebSocket("wss://civilized-duels.herokuapp.com/");
+    this.connection = new WebSocket("ws://localhost:3000/");
 
     this.connection.onmessage = (event) => {
       let message = JSON.parse(event.data);
@@ -95,6 +116,9 @@ export default {
           this.board.set({
             viewOnly: false,
           });
+          if (this.isWhite) {
+            this.timer = setInterval(() => this.handleTimer(), 1000);
+          }
           break;
         case "updateBoard":
           console.log(message.move);
@@ -114,17 +138,19 @@ export default {
             if (this.game.in_checkmate()) {
               console.log("You lose!");
               this.sendGameOver("lose");
-              this.$emit("gameOver");
+              this.gameOver();
             } else {
               console.log("Draw!");
               this.sendGameOver("draw");
-              this.$emit("gameOver");
+              this.gameOver();
             }
+          } else {
+            this.timer = setInterval(() => this.handleTimer(), 1000);
           }
           break;
         case "opponentResigned":
           console.log("You win!");
-          this.$emit("gameOver");
+          this.gameOver();
       }
     };
 
@@ -138,7 +164,7 @@ export default {
         })
       );
 
-      setInterval(() => {
+      this.ping = setInterval(() => {
         this.connection.send(JSON.stringify({ type: "ping" }));
       }, 30000);
 
