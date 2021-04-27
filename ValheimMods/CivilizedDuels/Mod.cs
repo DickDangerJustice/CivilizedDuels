@@ -28,6 +28,7 @@ namespace CivilizedDuels
             challenged.name = "Challenged";
             StatusEffects["Challenged"] = challenged;
 
+            InputManager.Instance.InputRegister += RegisterInputs;
             PrefabManager.Instance.PrefabRegister += RegisterPrefabs;
             ObjectManager.Instance.ObjectRegister += InitObjects;
             harmony.PatchAll();
@@ -37,6 +38,33 @@ namespace CivilizedDuels
         //{
         //    harmony.UnpatchSelf();
         //}
+
+        private void Update()
+        {
+            // Since our Update function in our BepInEx mod class will load BEFORE Valheim loads,
+            // we need to check that ZInput is ready to use first.
+            if (ZInput.instance != null)
+            {
+                // Check if our button is pressed. This will only return true ONCE, right after our button is pressed.
+                // If we hold the button down, it won't spam toggle our menu.
+                if (ZInput.GetButtonDown("Escape_Challenge"))
+                {
+                    if (Player.m_localPlayer && Player.m_localPlayer.m_intro)
+                    {
+                        Player.m_localPlayer.m_intro = false;
+                        var hitData = new HitData();
+                        hitData.m_damage.m_damage = 99999f;
+                        Player.m_localPlayer.Damage(hitData);
+                    }
+                }
+            }
+        }
+
+        private void RegisterInputs(object sender, EventArgs e)
+        {
+            // Init menu toggle key
+            InputManager.Instance.RegisterButton("Escape_Challenge", KeyCode.P);
+        }
 
         private void RegisterPrefabs(object sender, EventArgs e)
         {
