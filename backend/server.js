@@ -113,11 +113,13 @@ function gameOver(message) {
 function clientDisconnect(ws) {
   console.log("Client disconnected")
   if (websocketGameMap.has(ws)) {
+    console.log("Handling disconnect")
     const connection = websocketGameMap.get(ws)
     if (connection.gameId in webConnections) {
-      for (const webConnection in webConnections) {
+      for (const webConnection in webConnections[connection.gameId]) {
         webConnections[connection.gameId][webConnection].close()
         delete webConnections[connection.gameId][webConnection]
+        websocketGameMap.delete(webConnection)
       }
     }
     if (connection.gameId in valheimConnections) {
@@ -126,6 +128,7 @@ function clientDisconnect(ws) {
           type: "gameOver",
           state: "draw"
         }))
+        websocketGameMap.delete(valheimConnection)
       }
     }
   }
