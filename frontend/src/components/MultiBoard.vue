@@ -66,7 +66,7 @@ export default {
           gameId: this.gameId,
           isWhite: this.isWhite,
           move: move,
-          time: this.opponentTime,
+          time: this.time,
         })
       );
     },
@@ -111,6 +111,7 @@ export default {
   },
   created() {
     this.time = this.startingTime;
+    this.opponentTime = this.startingTime;
     console.log("Starting connection to WebSocket Server");
     this.connection = new WebSocket("wss://civilized-duels.herokuapp.com");
 

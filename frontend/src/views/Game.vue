@@ -79,6 +79,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5vh 0;
+  padding-top: 5vh;
 }
 </style>
