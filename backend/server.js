@@ -80,6 +80,7 @@ function move(message) {
     JSON.stringify({
       type: "updateBoard",
       move: message.move,
+      time: message.time,
     })
   );
 }

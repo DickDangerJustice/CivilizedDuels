@@ -13,8 +13,10 @@
         :startingTime="time"
         @gameOver="handleGameOver"
         @timeChanged="updateTimer"
+        @opponentTimeChanged="updateOpponentTimer"
       ></multi-board>
-      <h5>Time remaining: {{ time }}</h5>
+      <h5>Time remaining: {{ time | timecode }}</h5>
+      <h5>Opponent Time remaining: {{ opponentTime | timecode }}</h5>
     </div>
 
     <h1 v-else>Game over!</h1>
@@ -34,7 +36,8 @@ export default {
     return {
       resigned: false,
       isGameOver: false,
-      time: 60,
+      time: 180,
+      opponentTime: 180,
     };
   },
   methods: {
@@ -50,10 +53,23 @@ export default {
     updateTimer(time) {
       this.time = time;
     },
+    updateOpponentTimer(time) {
+      this.opponentTime = time;
+    },
   },
   mounted() {
     console.log(`Game id: ${this.gameId}`);
     console.log(`Player color: ${this.isWhite ? "white" : "black"}`);
+  },
+  filters: {
+    timecode(value) {
+      var seconds = Math.floor(value % 60).toString();
+      var minutes = Math.floor(value / 60).toString();
+      if (seconds.length === 1) {
+        seconds = "0" + seconds;
+      }
+      return minutes + ":" + seconds;
+    },
   },
 };
 </script>

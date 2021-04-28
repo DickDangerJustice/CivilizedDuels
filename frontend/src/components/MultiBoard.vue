@@ -16,14 +16,19 @@ export default {
     time: function (val) {
       this.$emit("timeChanged", val);
     },
+    opponentTime: function (val) {
+      this.$emit("opponentTimeChanged", val);
+    },
   },
   data: function () {
     return {
       connection: null,
       gameState: null,
       timer: null,
+      opponentTimer: null,
       ping: null,
       time: 0,
+      opponentTime: 0,
     };
   },
   methods: {
@@ -54,12 +59,14 @@ export default {
     sendUpdate(move) {
       console.log(this.connection);
       clearInterval(this.timer);
+      this.opponentTimer = setInterval(() => (this.opponentTime -= 1), 1000);
       this.connection.send(
         JSON.stringify({
           type: "move",
           gameId: this.gameId,
           isWhite: this.isWhite,
           move: move,
+          time: this.opponentTime,
         })
       );
     },
@@ -145,6 +152,8 @@ export default {
               this.gameOver();
             }
           } else {
+            this.opponentTime = message.time;
+            clearInterval(this.opponentTimer);
             this.timer = setInterval(() => this.handleTimer(), 1000);
           }
           break;
