@@ -28,7 +28,7 @@ namespace CivilizedDuels.Patches
 
             if (!string.IsNullOrEmpty(hit.m_statusEffect))
             {
-                if (hit.m_statusEffect == "Challenged")
+                if (hit.m_statusEffect.StartsWith("Challenged"))
                 {
                     if (__instance.IsPlayer() && attacker != null && attacker.IsPlayer())
                     {
@@ -49,11 +49,12 @@ namespace CivilizedDuels.Patches
                         //dynamic message = new JObject();
                         var isAttacker = hit.m_attacker.userID == ZDOMan.instance.GetMyID();
 
+                        var gameId = !isAttacker ? Guid.NewGuid().ToString() : hit.m_statusEffect.Split(':').Last();
                         var message = new Message
                         {
                             type = "connectValheim",
                             isWhite = isAttacker,
-                            gameId = isAttacker ? ZDOMan.instance.GetMyID().ToString() : hit.m_attacker.userID.ToString()
+                            gameId = gameId
                         };
 
                         //message.type = "connectValheim";
@@ -63,11 +64,11 @@ namespace CivilizedDuels.Patches
                         if (!isAttacker)
                         {
                             //webSocketClient.Send("Challenged by id: " + hit.m_attacker.userID);
+                            hit.m_statusEffect = $"Challenged:{gameId}";
                             attacker.Damage(hit);
                         }
 
-                        
-                        Application.OpenURL($"https://serene-johnson-5519cc.netlify.app/game/{hit.m_attacker.userID}?isWhite={isAttacker}");
+                        Application.OpenURL($"{Mod.SiteUrl.Value}/game/{gameId}?isWhite={isAttacker}");
                     }
                     return false;
                 }

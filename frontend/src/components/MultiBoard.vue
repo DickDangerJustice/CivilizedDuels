@@ -105,7 +105,7 @@ export default {
   created() {
     this.time = this.startingTime;
     console.log("Starting connection to WebSocket Server");
-    this.connection = new WebSocket("ws://localhost:3000/");
+    this.connection = new WebSocket("wss://civilized-duels.herokuapp.com");
 
     this.connection.onmessage = (event) => {
       let message = JSON.parse(event.data);

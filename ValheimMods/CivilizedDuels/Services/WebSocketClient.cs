@@ -19,7 +19,7 @@ namespace CivilizedDuels.Services {
 
         public void Start()
         {
-            ws = new WebSocket("wss://civilized-duels.herokuapp.com//");
+            ws = new WebSocket(Mod.WebSocketEndpoint.Value);
 
             ws.OnOpen += (sender, e) =>
                 Debug.Log("WS connected!");

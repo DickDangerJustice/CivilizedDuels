@@ -5,10 +5,9 @@ using JotunnLib.Managers;
 using Shared;
 using System;
 using UnityEngine;
-using CivilizedDuels.Services;
-using CivilizedDuels.Prefabs;
 using System.Collections.Generic;
 using CivilizedDuels.StatusEffects;
+using BepInEx.Configuration;
 
 namespace CivilizedDuels
 {
@@ -19,9 +18,14 @@ namespace CivilizedDuels
         private readonly Harmony harmony = new Harmony("dickdangerjustice.CivilizedDuels");
         public static Dictionary<string, StatusEffect> StatusEffects = new Dictionary<string, StatusEffect>();
         public static GameObject WebSocketObject;
+        public static ConfigEntry<string> WebSocketEndpoint;
+        public static ConfigEntry<string> SiteUrl;
 
         void Awake()
         {
+            WebSocketEndpoint = Config.Bind("General", "WebSocketEndpoint", "wss://civilized-duels.herokuapp.com", "WebSocket Endpoint");
+            SiteUrl = Config.Bind("General", "SiteUrl", "https://serene-johnson-5519cc.netlify.app", "Site Url");
+
             // add status effects
             var challenged = ScriptableObject.CreateInstance(typeof(SE_Challenged)) as SE_Challenged;
             // TODO: should this be set on every instance? Consider
