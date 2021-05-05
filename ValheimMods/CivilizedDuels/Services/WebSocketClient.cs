@@ -24,11 +24,6 @@ namespace CivilizedDuels.Services {
             ws.OnOpen += (sender, e) =>
                 Debug.Log("WS connected!");
 
-            //ws.OnMessage += (sender, e) =>
-            //{
-            //    Chat.instance.SendText(Talker.Type.Shout, e.Data);
-            //};
-
             ws.OnMessage += (sender, e) =>
             {
                 var message = JsonMapper.ToObject<Message>(e.Data);

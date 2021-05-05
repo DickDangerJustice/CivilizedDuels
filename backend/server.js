@@ -33,6 +33,9 @@ wss.on("connection", (ws) => {
       case "resign":
         resign(message);
         break;
+      case "forceQuit":
+        forceQuit(ws);
+        break;
       case "gameOver":
         gameOver(message);
         break;
@@ -83,6 +86,35 @@ function move(message) {
       time: message.time,
     })
   );
+}
+
+function forceQuit(ws) {
+  if (webSocketGameMap.has(ws)) {
+    const connection = webSocketGameMap.get(ws);
+
+    if (connection.gameId in webConnections) {
+      if (webConnections[connection.gameId][!connection.isWhite]) {
+        webConnections[connection.gameId][!connection.isWhite].send(
+          JSON.stringify({
+            type: "opponentResigned",
+          })
+        );
+      }
+    }
+    deleteWebConnections(connection.gameId);
+
+    if (connection.gameId in valheimConnections) {
+      for (const valheimConnection in valheimConnections[connection.gameId]) {
+        valheimConnections[connection.gameId][valheimConnection].send(
+          JSON.stringify({
+            type: "gameOver",
+            state: "draw",
+          })
+        );
+        webSocketGameMap.delete(valheimConnection);
+      }
+    }
+  }
 }
 
 function resign(message) {
@@ -151,7 +183,6 @@ function clientDisconnect(ws) {
 
     if (connection.gameId in webConnections) {
       if (webConnections[connection.gameId][!connection.isWhite]) {
-        console.log("test");
         webConnections[connection.gameId][!connection.isWhite].send(
           JSON.stringify({
             type: "opponentResigned",

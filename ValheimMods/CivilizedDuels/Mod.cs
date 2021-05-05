@@ -9,6 +9,7 @@ using BepInEx.Configuration;
 using Jotunn.Utils;
 using System.Reflection;
 using Jotunn.Configs;
+using CivilizedDuels.Services;
 
 namespace CivilizedDuels
 {
@@ -59,6 +60,8 @@ namespace CivilizedDuels
                         var hitData = new HitData();
                         hitData.m_damage.m_damage = 99999f;
                         Player.m_localPlayer.Damage(hitData);
+                        var client = WebSocketObject.GetComponent<WebSocketClient>();
+                        client.Send("forceQuit");
                     }
                 }
             }
