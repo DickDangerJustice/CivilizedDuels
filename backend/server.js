@@ -104,6 +104,13 @@ function forceQuit(ws) {
           })
         );
       }
+      if (webConnections[connection.gameId][connection.isWhite]) {
+        webConnections[connection.gameId][connection.isWhite].send(
+          JSON.stringify({
+            type: "opponentResigned",
+          })
+        );
+      }
     }
     deleteWebConnections(connection.gameId);
 
