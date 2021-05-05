@@ -1,47 +1,48 @@
 ﻿using BepInEx;
 using HarmonyLib;
-using JotunnLib.Entities;
-using JotunnLib.Managers;
-using Shared;
-using System;
+using Jotunn.Entities;
+using Jotunn.Managers;
 using UnityEngine;
 using System.Collections.Generic;
 using CivilizedDuels.StatusEffects;
 using BepInEx.Configuration;
+using Jotunn.Utils;
+using System.Reflection;
+using Jotunn.Configs;
 
 namespace CivilizedDuels
 {
-    [BepInPlugin("dickdangerjustice.CivilizedDuels", "Civilized Duels", "1.0.0")]
-    [BepInDependency(JotunnLib.JotunnLib.ModGuid)]
+    [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
+    [BepInDependency(Jotunn.Main.ModGuid)]
+    [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public class Mod : BaseUnityPlugin
     {
+        public const string PluginGUID = "dickdangerjustice.CivilizedDuels";
+        public const string PluginName = "Civilized Duels";
+        public const string PluginVersion = "1.0.0";
+
+        private AssetBundle slappingFishBundle;
+        private GameObject slappingFish;
+        private ButtonConfig escapeChallenge;
+        private CustomStatusEffect challengedEffect;
+
         private readonly Harmony harmony = new Harmony("dickdangerjustice.CivilizedDuels");
-        public static Dictionary<string, StatusEffect> StatusEffects = new Dictionary<string, StatusEffect>();
+        //public static Dictionary<string, StatusEffect> StatusEffects = new Dictionary<string, StatusEffect>();
         public static GameObject WebSocketObject;
         public static ConfigEntry<string> WebSocketEndpoint;
         public static ConfigEntry<string> SiteUrl;
 
         void Awake()
         {
-            WebSocketEndpoint = Config.Bind("General", "WebSocketEndpoint", "wss://civilized-duels.herokuapp.com", "WebSocket Endpoint");
-            SiteUrl = Config.Bind("General", "SiteUrl", "https://serene-johnson-5519cc.netlify.app", "Site Url");
+            // Load, create and init your custom mod stuff
+            CreateConfigValues();
+            LoadAssets();
+            AddInputs();
+            AddStatusEffects();
+            AddMockedItems();
 
-            // add status effects
-            var challenged = ScriptableObject.CreateInstance(typeof(SE_Challenged)) as SE_Challenged;
-            // TODO: should this be set on every instance? Consider
-            challenged.name = "Challenged";
-            StatusEffects["Challenged"] = challenged;
-
-            InputManager.Instance.InputRegister += RegisterInputs;
-            PrefabManager.Instance.PrefabRegister += RegisterPrefabs;
-            ObjectManager.Instance.ObjectRegister += InitObjects;
             harmony.PatchAll();
         }
-
-        //void OnDestroy()
-        //{
-        //    harmony.UnpatchSelf();
-        //}
 
         private void Update()
         {
@@ -50,8 +51,7 @@ namespace CivilizedDuels
             if (ZInput.instance != null)
             {
                 // Check if our button is pressed. This will only return true ONCE, right after our button is pressed.
-                // If we hold the button down, it won't spam toggle our menu.
-                if (ZInput.GetButtonDown("Escape_Challenge"))
+                if (ZInput.GetButtonDown("EscapeChallenge"))
                 {
                     if (Player.m_localPlayer && Player.m_localPlayer.m_intro)
                     {
@@ -64,68 +64,83 @@ namespace CivilizedDuels
             }
         }
 
-        private void RegisterInputs(object sender, EventArgs e)
+        // Create some sample configuration values to check server sync
+        private void CreateConfigValues()
         {
-            // Init menu toggle key
-            InputManager.Instance.RegisterButton("Escape_Challenge", KeyCode.P);
+            Config.SaveOnConfigSet = true;
+
+            // Add server config which gets pushed to all clients connecting and can only be edited by admins
+            // In local/single player games the player is always considered the admin
+            WebSocketEndpoint = Config.Bind("Server config", "WebSocketEndpoint", "wss://civilized-duels.herokuapp.com", new ConfigDescription("Web Socket Endpoint", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+            SiteUrl = Config.Bind("Server config", "SiteUrl", "https://serene-johnson-5519cc.netlify.app", new ConfigDescription("Site Url", null, new ConfigurationManagerAttributes { IsAdminOnly = true }));
+
+            // Add a client side custom input key
+            Config.Bind("Client config", "EscapeChallenge", KeyCode.P, new ConfigDescription("Terminate a challenge as a loss."));
         }
 
-        private void RegisterPrefabs(object sender, EventArgs e)
+        // Various forms of asset loading
+        private void LoadAssets()
         {
-            var slappingFishBundle = AssetBundleHelper.GetAssetBundleFromResources("slappingfish");
-            var slappingFish = slappingFishBundle.LoadAsset<GameObject>("Assets/CustomItems/SlappingFish/SlappingFish.prefab");
-            var slappingFishItemDrop = slappingFish.GetComponent<ItemDrop>();
-            slappingFishItemDrop.m_itemData.m_shared.m_damages.m_slash = 0;
-            slappingFishItemDrop.m_itemData.m_shared.m_damages.m_pierce = 0;
-
-            // set status effect
-            slappingFishItemDrop.m_itemData.m_shared.m_attackStatusEffect = StatusEffects["Challenged"];
-            PrefabManager.Instance.RegisterPrefab(slappingFish, "SlappingFish");
+            //Load embedded resources
+            Jotunn.Logger.LogInfo($"Embedded resources: {string.Join(",", Assembly.GetExecutingAssembly().GetManifestResourceNames())}");
+            slappingFishBundle = AssetUtils.LoadAssetBundleFromResources("slappingfish", Assembly.GetExecutingAssembly());
+            slappingFish = slappingFishBundle.LoadAsset<GameObject>("Assets/CustomItems/SlappingFish/SlappingFish.prefab");
         }
 
-        private void InitObjects(object sender, EventArgs e)
+        // Add custom key bindings
+        private void AddInputs()
         {
-            foreach (var statusEffect in StatusEffects.Values)
+            // Add key bindings backed by a config value
+            escapeChallenge = new ButtonConfig
             {
-                // register status effect
-                if (ObjectDB.instance.GetStatusEffect(statusEffect.name) == null)
+                Name = "EscapeChallenge",
+                Key = (KeyCode)Config["Client config", "EscapeChallenge"].BoxedValue,
+                HintToken = "Terminate a challenge as a loss."
+            };
+            InputManager.Instance.AddButton(PluginGUID, escapeChallenge);
+        }
+
+        // Add new status effects
+        private void AddStatusEffects()
+        {
+            StatusEffect effect = ScriptableObject.CreateInstance<SE_Challenged>();
+            effect.name = "Challenged";
+
+            challengedEffect = new CustomStatusEffect(effect, fixReference: false);  // We dont need to fix refs here, because no mocks were used
+            ItemManager.Instance.AddStatusEffect(challengedEffect);
+        }
+
+        // Implementation of assets using mocks, adding recipe's manually without the config abstraction
+        private void AddMockedItems()
+        {
+            Jotunn.Logger.LogInfo("test items");
+            if (!slappingFish) Jotunn.Logger.LogWarning($"Failed to load asset from bundle: {slappingFishBundle}");
+            else
+            {
+                Jotunn.Logger.LogInfo("test items 2");
+                // Create and add a custom item
+                CustomItem CI = new CustomItem(slappingFish, true);
+                CI.ItemDrop.m_itemData.m_shared.m_attackStatusEffect = challengedEffect.StatusEffect;
+                CI.ItemDrop.m_itemData.m_shared.m_damages.m_slash = 0;
+                CI.ItemDrop.m_itemData.m_shared.m_damages.m_pierce = 0;
+                ItemManager.Instance.AddItem(CI);
+
+                //Create and add a custom recipe
+                Recipe recipe = ScriptableObject.CreateInstance<Recipe>();
+                recipe.m_item = slappingFish.GetComponent<ItemDrop>();
+                recipe.m_craftingStation = Mock<CraftingStation>.Create("piece_workbench");
+                var ingredients = new List<Piece.Requirement>
                 {
-                    Debug.Log($"Registered status effect: {statusEffect.name}");
-                    ObjectDB.instance.m_StatusEffects.Add(statusEffect);
-                }
+                    MockRequirement.Create("Wood", 1),
+                };
+                recipe.m_resources = ingredients.ToArray();
+                CustomRecipe CR = new CustomRecipe(recipe, true, true);
+                ItemManager.Instance.AddRecipe(CR);
+
+                //Enable BoneReorder
+                BoneReorder.ApplyOnEquipmentChanged();
             }
-
-            // Add slapping fish as an item
-            ObjectManager.Instance.RegisterItem("SlappingFish");
-
-            // Add a sample recipe for the example sword
-            ObjectManager.Instance.RegisterRecipe(new RecipeConfig()
-            {
-                // Name of the recipe (defaults to "Recipe_YourItem")
-                Name = "Recipe_SlappingFish",
-
-                // Name of the prefab for the crafted item
-                Item = "SlappingFish",
-
-                // Name of the prefab for the crafting station we wish to use
-                // Can set this to null or leave out if you want your recipe to be craftable in your inventory
-                CraftingStation = "piece_workbench",
-
-                RepairStation = "piece_workbench",
-
-                // List of requirements to craft your item
-                Requirements = new PieceRequirementConfig[]
-                {
-                    new PieceRequirementConfig()
-                    {
-                        // Prefab name of requirement
-                        Item = "Wood",
-
-                        // Amount required
-                        Amount = 1
-                    }
-                }
-            });
+            slappingFishBundle.Unload(false);
         }
     }
 }

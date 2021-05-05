@@ -44,8 +44,8 @@
     <Reference Include="BepInEx">
       <HintPath>..\..\..\Libs\New\BepInEx.dll</HintPath>
     </Reference>
-    <Reference Include="JotunnLib">
-      <HintPath>..\..\..\Libs\New\JotunnLib.dll</HintPath>
+    <Reference Include="Jotunn">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins\Jotunn.dll</HintPath>
     </Reference>
     <Reference Include="LitJSON, Version=0.17.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\LitJson.0.17.0\lib\net45\LitJSON.dll</HintPath>
@@ -81,16 +81,15 @@
     <Compile Include="Mod.cs" />
     <Compile Include="Patches\Character.cs" />
     <Compile Include="Patches\Game.cs" />
-    <Compile Include="Prefabs\CivilizedDagger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\WebSocketClient.cs" />
     <Compile Include="StatusEffects\SE_Challenged.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <EmbeddedResource Include="slappingfish" />
+    <EmbeddedResource Include="AssetsEmbedded\slappingfish" />
   </ItemGroup>
-  <Import Project="..\Shared\Shared.projitems" Label="Shared" />
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetDir)$(TargetName).dll" "C:\Program Files (x86)\Steam\steamapps\common\Valheim\BepInEx\plugins\dickdangerjustice\CivilizedDuels\$(TargetName).dll"

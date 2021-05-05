@@ -5,13 +5,7 @@ VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CivilizedDuels", "CivilizedDuels\CivilizedDuels.csproj", "{DAC1281A-C479-4CF6-8341-3796ABAA09CD}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Shared", "Shared\Shared.shproj", "{3D6E9597-2562-40C4-9863-D21A49573F3C}"
-EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Shared\Shared.projitems*{3d6e9597-2562-40c4-9863-d21a49573f3c}*SharedItemsImports = 13
-		Shared\Shared.projitems*{dac1281a-c479-4cf6-8341-3796abaa09cd}*SharedItemsImports = 4
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
