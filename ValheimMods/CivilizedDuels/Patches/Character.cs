@@ -30,7 +30,7 @@ namespace CivilizedDuels.Patches
             {
                 if (hit.m_statusEffect.StartsWith("Challenged"))
                 {
-                    if (__instance.IsPlayer() && attacker != null && attacker.IsPlayer())
+                    if (__instance.IsPlayer() && attacker != null && attacker.IsPlayer() && attacker.IsPVPEnabled())
                     {
                         ((Player)__instance).m_intro = true;
                         var webSocketClient = Mod.WebSocketObject.GetComponent<WebSocketClient>();

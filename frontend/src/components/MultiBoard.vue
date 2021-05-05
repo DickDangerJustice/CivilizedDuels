@@ -126,6 +126,11 @@ export default {
           });
           if (this.isWhite) {
             this.timer = setInterval(() => this.handleTimer(), 1000);
+          } else {
+            this.opponentTimer = setInterval(
+              () => (this.opponentTime -= 1),
+              1000
+            );
           }
           break;
         case "updateBoard":

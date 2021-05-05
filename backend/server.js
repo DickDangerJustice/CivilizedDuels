@@ -19,26 +19,30 @@ wss.on("connection", (ws) => {
     // console.log(data)
     console.log("data received \n %o", data);
 
-    const message = JSON.parse(data);
-    switch (message.type) {
-      case "connectValheim":
-        connectValheim(message, ws);
-        break;
-      case "joinGame":
-        joinGame(message, ws);
-        break;
-      case "move":
-        move(message);
-        break;
-      case "resign":
-        resign(message);
-        break;
-      case "forceQuit":
-        forceQuit(ws);
-        break;
-      case "gameOver":
-        gameOver(message);
-        break;
+    try {
+      const message = JSON.parse(data);
+      switch (message.type) {
+        case "connectValheim":
+          connectValheim(message, ws);
+          break;
+        case "joinGame":
+          joinGame(message, ws);
+          break;
+        case "move":
+          move(message);
+          break;
+        case "resign":
+          resign(message);
+          break;
+        case "forceQuit":
+          forceQuit(ws);
+          break;
+        case "gameOver":
+          gameOver(message);
+          break;
+      }
+    } catch {
+      console.log("Failed to handle message!");
     }
   });
 
