@@ -135,6 +135,7 @@ namespace CivilizedDuels
 
                 //Create and add a custom recipe
                 Recipe recipe = ScriptableObject.CreateInstance<Recipe>();
+                recipe.name = "Recipe_SlappingFish";
                 recipe.m_item = slappingFish.GetComponent<ItemDrop>();
                 recipe.m_craftingStation = Mock<CraftingStation>.Create("piece_workbench");
                 var ingredients = new List<Piece.Requirement>
